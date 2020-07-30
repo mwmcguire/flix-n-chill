@@ -102,10 +102,6 @@ $(document).ready(function () {
     let movieLocation = $('#search_location_input').val().trim();
     let movieRating = $('#select_rating :selected').val();
 
-    console.log(movieSearch);
-    console.log(movieLocation);
-    console.log(movieRating);
-
     getMovie(movieSearch);
     getCinema(movieLocation);
   });
@@ -138,10 +134,14 @@ $(document).ready(function () {
       let movieRuntime = response.Runtime;
       let movieRated = response.Rated;
 
+      if (movieIMG === undefined) {
+        movieIMG = './assets/images/movie_poster.png';
+      }
+
       $('#movie-poster')
         .empty()
         .html(
-          `<img src=${movieIMG}alt="movie_poster" class="img-thumbnail mb-4">`
+          `<img src=${movieIMG} alt="Movie Poster" class="img-thumbnail mb-4">`
         );
       $('#movie-title').empty().text(movieTitle);
       $('#movie-plot').empty().text(moviePlot);
