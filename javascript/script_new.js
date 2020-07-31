@@ -51,15 +51,36 @@ $(document).ready(function () {
   }, bannerTimer);
 
   // SHOWTIMES MOVIE DATABASE:
-  var apikey = '5s58ed6xnp59p2n5e4arr26c';
-  var baseUrl = 'http://data.tmsapi.com/v1.1';
-  var showtimesUrl = baseUrl + '/movies/showings';
+  var apikey = '0OYgfApT4m4icnGPLkvla2abLCtN02mN3qObWwAy';
+  var url = 'https://api-gate2.movieglu.com/filmsNowShowing/?n=10';
   var zipCode = '78701';
   var d = new Date();
   var today = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
 
+  var request = {
+    url: url,
+    method: 'GET',
+    timeout: 0,
+    headers: {
+      'api-version': 'v200',
+      Authorization: 'Basic A1B2c3D4E5f6H7I8j911M12=',
+      client: 'MWMC',
+      'x-api-key': 'IyrBUDT7CuTTc6LH45mI5aAoG8',
+      'device-datetime': '2020-06-18T12:07:57.296Z',
+      territory: 'US',
+    },
+  };
+
   var allMovies;
   var availableTags = [];
+
+  $.ajax(request).done(function (response) {
+    console.log(response);
+    // allMovies = response.movies;
+    // console.log(allMovies);
+    // Allow text input
+    $('#fieldset').attr('disabled', false);
+  });
 
   // Autocomplete widget
   $(function () {
