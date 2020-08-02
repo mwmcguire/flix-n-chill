@@ -1,22 +1,30 @@
+// Require dependencies
 const express = require('express');
 const path = require('path');
-const request = require('request');
+const fetch = require('node-fetch'); // window.fetch for node.js
+const convert = require('xml-js'); // convert xml to json
+const rateLimit = require('express-rate-limit'); // limit repeated requests to APIs
+const { json } = require('body-parser');
+require('dotenv').config();
 
 const app = express();
 
+// Apply rate-limits to all requests
+// const limiter = rateLimit({
+//   windowMS: 1000,
+//   max: 1,
+// });
+
+// app.use(limiter);
+
 // Load index page
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
-});
+app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
 
 // SHOWTIMES MOVIE DATABASE:
-// const apikey = '0OYgfApT4m4icnGPLkvla2abLCtN02mN3qObWwAy';
-// const baseURL = 'https://api-gate2.movieglu.com/';
-// const filmsNowShowingRoute = 'filmsNowShowing/?n=10';
-// const cinemasNearbyRoute = 'cinemasNearby/?n=5';
-// const zipCode = '78701';
-// const d = new Date();
-// const today = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
+const apikey = process.env.API_KEY;
+const baseURL = 'https://api-gate2.movieglu.com/';
+const filmsNowShowingRoute = 'filmsNowShowing/?n=10';
+const cinemasNearbyRoute = 'cinemasNearby/?n=5';
 
 // const settings = {
 //   url: 'https://cors-anywhere.herokuapp.com/' + baseURL + filmsNowShowingRoute,
@@ -33,20 +41,41 @@ app.get('/', (req, res) => {
 //   },
 // };
 
-// app.use((req, res, next) => {
-//   res.header('Access-Control-Allow-Origin', '*');
-//   next();
-// });
+// apply Access-Control-Allow-Origin: * header to every response
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  next();
+});
 
-// app.get('/films', (req, res) => {
-//   request({ url: baseURL + filmsNowShowingRoute }, (error, response, body) => {
-//     if (error || response.statusCode !== 200) {
-//       return res.status(500).json({ type: 'error', message: err.message });
-//     }
+// api route
+app.get('/api/films', async (req, res) => {
+  try {
+    req.header({
+      client: 'MWMC',
+      'x-api-key': apikey,
+      authorization: 'Basic TVdNQzo2R3hJd2V4WnZXeng=',
+      territory: 'US',
+      'api-version': 'v200',
+      geolocation: '-34.397;150.644',
+      'device-datetime': '2020-06-18T12:07:57.296Z',
+    });
 
-//     res.json(JSON.parse(body));
-//   });
-// });
+    const apiResponse = await fetch(
+      'https://api-gate2.movieglu.com/filmsNowShowing/?n=10'
+    );
+    const apiData = await apiResponse.json();
+
+    return res.json({
+      success: true,
+      apiData,
+    });
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      message: err.message,
+    });
+  }
+});
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`listening on ${PORT}`));
