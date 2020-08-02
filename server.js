@@ -9,6 +9,11 @@ require('dotenv').config();
 
 const app = express();
 
+// Middleware
+app.use(express.urlencoded({ extended: false }));
+app.use(express.json());
+app.use(express.static('public')); // serve static files
+
 // Apply rate-limits to all requests
 // const limiter = rateLimit({
 //   windowMS: 1000,
