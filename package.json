@@ -1,0 +1,26 @@
+{
+  "name": "flix-n-chill",
+  "version": "1.0.0",
+  "description": "App designed to allow users to search for movie showtimes based on their location by zipcode. This app uses the OMDB database to search for movie information and the International Showtimes API for showtimes playing in theaters.",
+  "main": "server.js",
+  "dependencies": {
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "request": "^2.88.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mwmcguire/flix-n-chill.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mwmcguire/flix-n-chill/issues"
+  },
+  "homepage": "https://github.com/mwmcguire/flix-n-chill#readme"
+}
