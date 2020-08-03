@@ -20,12 +20,6 @@ const apikey = process.env.API_KEY;
 // const filmsNowShowing = 'filmsNowShowing/?n=10';
 // const cinemasNearby = 'cinemasNearby/?n=5';
 
-// apply Access-Control-Allow-Origin: * header to every response
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  next();
-});
-
 // api route
 app.get('/api/cinemas', async (req, res) => {
   const settings = {
