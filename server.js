@@ -2,8 +2,6 @@
 const express = require('express');
 const path = require('path');
 const fetch = require('node-fetch'); // window.fetch for node.js
-const convert = require('xml-js'); // convert xml to json
-const rateLimit = require('express-rate-limit'); // limit repeated requests to APIs
 require('dotenv').config();
 
 const app = express();
@@ -13,28 +11,20 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(express.static('public')); // serve static files
 
-// Apply rate-limits to all requests
-// const limiter = rateLimit({
-//   windowMS: 1000,
-//   max: 1,
-// });
-
-// app.use(limiter);
-
 // Load index page
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
 
 // SHOWTIMES MOVIE DATABASE:
 const apikey = process.env.API_KEY;
-const baseURL = 'https://api-gate2.movieglu.com/';
-const filmsNowShowingRoute = 'filmsNowShowing/?n=10';
-const cinemasNearbyRoute = 'cinemasNearby/?n=5';
+// const baseURL = 'https://api-gate2.movieglu.com/';
+// const filmsNowShowing = 'filmsNowShowing/?n=10';
+// const cinemasNearby = 'cinemasNearby/?n=5';
 
 // apply Access-Control-Allow-Origin: * header to every response
-// app.use((req, res, next) => {
-//   res.header('Access-Control-Allow-Origin', '*');
-//   next();
-// });
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  next();
+});
 
 // api route
 app.get('/api/cinemas', async (req, res) => {
@@ -54,12 +44,14 @@ app.get('/api/cinemas', async (req, res) => {
 
   try {
     const response = await fetch(
-      'https://api-gate2.movieglu.com/cinemasNearby/?n=5',
+      'https://api-gate2.movieglu.com/filmsNowShowing/?n=10',
       settings
     );
     const data = await response.json();
 
-    console.log(data);
+    data.films.forEach((movie) => {
+      console.log(movie.film_name);
+    });
 
     return res.json({
       success: true,

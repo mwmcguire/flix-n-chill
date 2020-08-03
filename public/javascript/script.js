@@ -57,7 +57,9 @@ $(document).ready(function () {
     url: '/api/cinemas',
     type: 'GET',
   }).done(function (response) {
-    console.log(response);
+    response.data.films.forEach((movie) => {
+      console.log(movie.film_name);
+    });
     // Allow text input
     $('#fieldset').attr('disabled', false);
   });
