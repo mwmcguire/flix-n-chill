@@ -54,7 +54,7 @@ $(document).ready(function () {
   var availableTags = [];
 
   $.ajax({
-    url: 'api/films',
+    url: '/api/cinemas',
     type: 'GET',
   }).done(function (response) {
     console.log(response);

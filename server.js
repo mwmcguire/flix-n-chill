@@ -4,7 +4,6 @@ const path = require('path');
 const fetch = require('node-fetch'); // window.fetch for node.js
 const convert = require('xml-js'); // convert xml to json
 const rateLimit = require('express-rate-limit'); // limit repeated requests to APIs
-const { json } = require('body-parser');
 require('dotenv').config();
 
 const app = express();
@@ -31,48 +30,40 @@ const baseURL = 'https://api-gate2.movieglu.com/';
 const filmsNowShowingRoute = 'filmsNowShowing/?n=10';
 const cinemasNearbyRoute = 'cinemasNearby/?n=5';
 
-// const settings = {
-//   url: 'https://cors-anywhere.herokuapp.com/' + baseURL + filmsNowShowingRoute,
-//   method: 'GET',
-//   timeout: 0,
-//   headers: {
-//     client: 'MWMC',
-//     'x-api-key': apikey,
-//     authorization: 'Basic TVdNQzo2R3hJd2V4WnZXeng=',
-//     territory: 'US',
-//     'api-version': 'v200',
-//     geolocation: '-34.397;150.644',
-//     'device-datetime': '2020-06-18T12:07:57.296Z',
-//   },
-// };
-
 // apply Access-Control-Allow-Origin: * header to every response
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  next();
-});
+// app.use((req, res, next) => {
+//   res.header('Access-Control-Allow-Origin', '*');
+//   next();
+// });
 
 // api route
-app.get('/api/films', async (req, res) => {
-  try {
-    req.header({
+app.get('/api/cinemas', async (req, res) => {
+  const settings = {
+    method: 'GET',
+    timeout: 0,
+    headers: {
       client: 'MWMC',
       'x-api-key': apikey,
-      authorization: 'Basic TVdNQzo2R3hJd2V4WnZXeng=',
-      territory: 'US',
+      authorization: 'Basic TVdNQ19YWDphZWJtZFA3dDNRemw=',
+      territory: 'XX',
       'api-version': 'v200',
-      geolocation: '-34.397;150.644',
+      geolocation: '-22.0;14.0',
       'device-datetime': '2020-06-18T12:07:57.296Z',
-    });
+    },
+  };
 
-    const apiResponse = await fetch(
-      'https://api-gate2.movieglu.com/filmsNowShowing/?n=10'
+  try {
+    const response = await fetch(
+      'https://api-gate2.movieglu.com/cinemasNearby/?n=5',
+      settings
     );
-    const apiData = await apiResponse.json();
+    const data = await response.json();
+
+    console.log(data);
 
     return res.json({
       success: true,
-      apiData,
+      data,
     });
   } catch (err) {
     return res.status(500).json({
