@@ -50,23 +50,14 @@ $(document).ready(function () {
     bannerLoop();
   }, bannerTimer);
 
-  // SHOWTIMES MOVIE DATABASE:
-  var showtimesURL = 'https://api.internationalshowtimes.com/v4';
-  var settings = {
-    url: 'https://api.internationalshowtimes.com/v4/movies',
-    method: 'GET',
-    headers: {
-      'X-API-Key': 'gZ1oAJY7Tz82K4S6yZ01mcrHyi9fRp53',
-    },
-  };
-
   var allMovies;
   var availableTags = [];
 
-  // Load all movies on page load
-  $.ajax(settings).done(function (response) {
-    allMovies = response.movies;
-    console.log(allMovies);
+  $.ajax({
+    url: '/api/cinemas',
+    type: 'GET',
+  }).done(function (response) {
+    console.log(response);
     // Allow text input
     $('#fieldset').attr('disabled', false);
   });
@@ -112,10 +103,6 @@ $(document).ready(function () {
     let movieLocation = $('#search_location_input').val().trim();
     let movieRating = $('#select_rating :selected').val();
 
-    console.log(movieSearch);
-    console.log(movieLocation);
-    console.log(movieRating);
-
     getMovie(movieSearch);
     getCinema(movieLocation);
   });
@@ -148,10 +135,14 @@ $(document).ready(function () {
       let movieRuntime = response.Runtime;
       let movieRated = response.Rated;
 
+      if (movieIMG === undefined) {
+        movieIMG = './assets/images/movie_poster.png';
+      }
+
       $('#movie-poster')
         .empty()
         .html(
-          `<img src=${movieIMG}alt="movie_poster" class="img-thumbnail mb-4">`
+          `<img src=${movieIMG} alt="Movie Poster" class="img-thumbnail mb-4">`
         );
       $('#movie-title').empty().text(movieTitle);
       $('#movie-plot').empty().text(moviePlot);
@@ -161,50 +152,72 @@ $(document).ready(function () {
     });
   }
 
-  // Function to pull cinema data from INTERNATIONAL SHOWTIMES API
+  // Function to pull cinema data from SHOWTIMES API
   let cinemaId = [];
-  function getCinema(movieLocation) {
+  function getCinema(zipCode) {
     // GET cinema name and id
     $.ajax({
-      url:
-        showtimesURL +
-        '/cinemas?search_query=' +
-        movieLocation +
-        '&search_field=zipcode&distance=100',
-      type: 'GET',
-      async: false,
-      headers: {
-        'X-API-Key': 'KBvReF0P6MlqDF9zeORmnpIrGRictjlU',
+      url: showtimesUrl,
+      data: {
+        startDate: today,
+        zip: zipCode,
+        jsonp: 'dataHandler',
+        api_key: apikey,
       },
+      dataType: 'jsonp',
     })
-      .done(function (data, textStatus, jqXHR) {
-        console.log('HTTP Request Succeeded: ' + jqXHR.status);
-        console.log(data);
-        let cinema = data.cinemas;
-        let output = '';
-        $.each(cinema, function (index, val) {
-          console.log(val.name);
-          console.log(val.id);
-          cinemaId.push(val.id);
-          output += `
-                <div class="card mb-5 mt-5">
-                    <div class="card-header">
-                        ${val.name}
-                    </div>
-                    <div class="card-body" id="movie-times">
-                        <h5 class="card-title">${val.location.address.display_text}</h5>
-                        <p class="card-text">Select a movie time to buy Standard Showtimes</p>
-                    </div>
-                </div>
-                `;
+      //   .done(function (data, textStatus, jqXHR) {
+      //     console.log('HTTP Request Succeeded: ' + jqXHR.status);
+      //     console.log(data);
+      //     let cinema = data.cinemas;
+      //     let output = '';
+      //     $.each(cinema, function (index, val) {
+      //       console.log(val.name);
+      //       console.log(val.id);
+      //       cinemaId.push(val.id);
+      //       output += `
+      //             <div class="card mb-5 mt-5">
+      //                 <div class="card-header">
+      //                     ${val.name}
+      //                 </div>
+      //                 <div class="card-body" id="movie-times">
+      //                     <h5 class="card-title">${val.location.address.display_text}</h5>
+      //                     <p class="card-text">Select a movie time to buy Standard Showtimes</p>
+      //                 </div>
+      //             </div>
+      //             `;
 
-          $('#cinema-display').empty().prepend(output);
-          getShowtimes(cinemaId);
-        });
-      })
+      //       $('#cinema-display').empty().prepend(output);
+      //       getShowtimes(cinemaId);
+      //     });
+      //   })
       .fail(function (jqXHR, textStatus, errorThrown) {
         console.log('HTTP Request Failed');
       });
+  }
+
+  function dataHandler(data) {
+    $(document.body).append(
+      '<p>Found ' +
+        data.length +
+        ' movies showing within 5 miles of ' +
+        zipCode +
+        ':</p>'
+    );
+    var movies = data.hits;
+    $.each(data, function (index, movie) {
+      var movieData =
+        '<div class="tile"><img src="http://developer.tmsimg.com/' +
+        movie.preferredImage.uri +
+        '?api_key=' +
+        apikey +
+        '"><br/>';
+      movieData += movie.title;
+      if (movie.ratings) {
+        movieData += ' (' + movie.ratings[0].code + ') </div>';
+      }
+      $(document.body).append(movieData);
+    });
   }
 
   // Function to pull cinema showtimes from INTERNATIONAL SHOWTIMES API
