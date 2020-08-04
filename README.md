@@ -8,7 +8,7 @@ HTML, CSS, JavaScript, JQuery
 
 ## Usage
 
-Click here --> https://mwmcguire.github.io/flix-n-chill/index.html
+Click here --> https://chill-n-flix.herokuapp.com/
 
 ## Authors and acknowledgement
 
